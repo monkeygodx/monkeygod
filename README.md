@@ -143,8 +143,16 @@ TELEGRAM_CHATROOM=https://t.me/yourchatroom
 ## Deploy on Railway (one app, two domains)
 
 Both `monkeygod.fun` and `monkeygod.cloud` point at the **same** Railway service.
-The app routes by hostname: `.xyz` shows the embedded card page, `.fun` shows the
+The app routes by hostname: `.cloud` shows the embedded card page, `.fun` shows the
 landing.
+
+### Where the Square keys live (important)
+In production the Square credentials (+ crypto wallets + Telegram links) are **not**
+kept in Railway — they live in **`data/config.json` inside a private Cloudflare R2
+bucket** (default name `monkeygod`). The app reads that file at runtime (30s cache)
+over the R2 S3 API, so keys can be rotated by editing the bucket with **no redeploy**.
+Railway only needs the R2 credentials to reach the bucket. If the R2 vars are left
+blank, the app falls back to the `SQUARE_*` / `CRYPTO_*` / `TELEGRAM_*` env vars.
 
 ### 1. Push the project to Railway
 - New Project → **Deploy from GitHub repo** (or `railway up` from the CLI).
@@ -153,22 +161,22 @@ landing.
 
 ### 2. Set the environment variables (Railway → service → **Variables**)
 ```
-SQUARE_ENV=production
-SQUARE_APP_ID=<your production Application ID>
-SQUARE_ACCESS_TOKEN=<your production Access Token>
-SQUARE_LOCATION_ID=<your production Location ID>
-SQUARE_VERSION=2024-10-17
 MAIN_SITE_URL=https://monkeygod.fun
 PAYMENT_SITE_URL=https://monkeygod.cloud
 PAYMENT_HOST=monkeygod.cloud
 PUBLIC_BASE_URL=https://monkeygod.cloud
-PREVIEW_BASE_URL=https://pub-8565158f23444cbbb9c07a3b1f102e56.r2.dev
-CRYPTO_BTC=...   CRYPTO_ETH=...   CRYPTO_LTC=...   CRYPTO_SOL=...
-TELEGRAM_ADMIN=https://t.me/youradmin
-TELEGRAM_CHANNEL=https://t.me/yourchannel
-TELEGRAM_CHATROOM=https://t.me/yourchatroom
+PREVIEW_BASE_URL=
+
+# Cloudflare R2 — the app reads Square keys + crypto + links from this bucket.
+# Make an R2 API token (Object Read) at: Cloudflare dash -> R2 -> Manage R2 API Tokens.
+R2_ACCOUNT_ID=<your Cloudflare account id>
+R2_BUCKET=monkeygod
+R2_CONFIG_KEY=data/config.json
+R2_ACCESS_KEY_ID=<from the R2 API token>
+R2_SECRET_ACCESS_KEY=<from the R2 API token>
 ```
-Do **not** put secrets in the repo — set them here. The `.env` file is for local only.
+The Square token / location / crypto / links go in the **R2 `data/config.json`**,
+not here. Only the R2 credentials live in Railway. Never put secrets in the repo.
 
 ### 3. Add both custom domains (Railway → service → **Settings → Networking → Custom Domain**)
 Add `monkeygod.fun`, then add `monkeygod.cloud`. For **each** domain Railway shows a

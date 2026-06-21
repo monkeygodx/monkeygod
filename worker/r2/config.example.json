@@ -2,7 +2,8 @@
   "square": {
     "env": "production",
     "accessToken": "",
-    "locationId": ""
+    "locationId": "",
+    "appId": ""
   },
   "webhookUrl": "https://YOUR-WORKER.workers.dev/api/square/webhook",
   "webhookSignatureKeys": [""],
