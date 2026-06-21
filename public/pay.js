@@ -153,16 +153,23 @@ async function initWallets(payments) {
 
 // ---- Card field ----
 async function initCard(payments) {
-  card = await payments.card({
-    style: {
-      input: { color: '#ffffff', fontSize: '16px' },
-      '.input-container': { borderColor: 'rgba(255,255,255,0.14)', borderRadius: '12px' },
-      '.input-container.is-focus': { borderColor: '#a855f7' },
-      '.input-container.is-error': { borderColor: '#ef4444' },
-      '.message-text.is-error': { color: '#fca5a5' },
-      '@placeholder': { color: '#6b7280' },
-    },
-  });
+  // Only Square-valid style selectors here. If the styled card ever fails to
+  // build, fall back to an unstyled (but fully working) field so checkout
+  // can't be blocked by a styling issue.
+  const style = {
+    input: { color: '#ffffff', fontSize: '16px' },
+    'input::placeholder': { color: '#6b7280' },
+    '.input-container': { borderColor: 'rgba(255,255,255,0.14)', borderRadius: '12px' },
+    '.input-container.is-focus': { borderColor: '#a855f7' },
+    '.input-container.is-error': { borderColor: '#ef4444' },
+    '.message-text.is-error': { color: '#fca5a5' },
+  };
+  try {
+    card = await payments.card({ style });
+  } catch (e) {
+    console.warn('[card] styled init failed, retrying unstyled', e);
+    card = await payments.card();
+  }
   await card.attach('#card-container');
   $('#card-status').hidden = true;
   $('#pay-btn').disabled = false;
