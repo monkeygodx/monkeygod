@@ -46,8 +46,8 @@ const PUBLIC_BASE_URL = (process.env.PUBLIC_BASE_URL || `http://localhost:${PORT
 // Two-domain setup: main site (.fun) and the payment site (.xyz). Both are
 // served by THIS one app; requests are routed by hostname. The "Get" buttons on
 // the main site send the buyer to PAYMENT_SITE_URL to actually pay.
-const PAYMENT_HOST = (process.env.PAYMENT_HOST || 'monkeygod.xyz').toLowerCase();
-const PAYMENT_SITE_URL = (process.env.PAYMENT_SITE_URL || 'https://monkeygod.xyz').replace(/\/$/, '');
+const PAYMENT_HOST = (process.env.PAYMENT_HOST || 'monkeygod.cloud').toLowerCase();
+const PAYMENT_SITE_URL = (process.env.PAYMENT_SITE_URL || 'https://monkeygod.cloud').replace(/\/$/, '');
 const MAIN_SITE_URL = (process.env.MAIN_SITE_URL || 'https://monkeygod.fun').replace(/\/$/, '');
 
 const SQUARE_ENV = (process.env.SQUARE_ENV || 'sandbox').toLowerCase();
@@ -249,7 +249,7 @@ app.post('/api/checkout', async (req, res) => {
 // page; everything else (the .fun main site, localhost) shows the landing.
 function isPaymentHost(req) {
   const host = (req.hostname || '').toLowerCase();
-  return host === PAYMENT_HOST || host.endsWith('.xyz') || host.endsWith(PAYMENT_HOST);
+  return host === PAYMENT_HOST || host.endsWith('.cloud') || host.endsWith(PAYMENT_HOST);
 }
 app.get('/', (req, res, next) => {
   if (isPaymentHost(req)) return res.sendFile(path.join(__dirname, 'public', 'pay.html'));

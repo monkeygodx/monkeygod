@@ -84,7 +84,7 @@ for **your own** Square account already has permission to create Payment Links.
 
 ### How the card flow works (embedded)
 1. Buyer clicks **Get …** on the main site (`monkeygod.fun`) → lands on the
-   payment site (`monkeygod.xyz/?tier=…`).
+   payment site (`monkeygod.cloud/?tier=…`).
 2. The payment page loads Square's **Web Payments SDK** and shows an embedded
    card field (hosted by Square in an iframe — card data never touches our server).
 3. On **Pay**, the SDK tokenizes the card and POSTs the one-time token to
@@ -142,7 +142,7 @@ TELEGRAM_CHATROOM=https://t.me/yourchatroom
 
 ## Deploy on Railway (one app, two domains)
 
-Both `monkeygod.fun` and `monkeygod.xyz` point at the **same** Railway service.
+Both `monkeygod.fun` and `monkeygod.cloud` point at the **same** Railway service.
 The app routes by hostname: `.xyz` shows the embedded card page, `.fun` shows the
 landing.
 
@@ -159,9 +159,9 @@ SQUARE_ACCESS_TOKEN=<your production Access Token>
 SQUARE_LOCATION_ID=<your production Location ID>
 SQUARE_VERSION=2024-10-17
 MAIN_SITE_URL=https://monkeygod.fun
-PAYMENT_SITE_URL=https://monkeygod.xyz
-PAYMENT_HOST=monkeygod.xyz
-PUBLIC_BASE_URL=https://monkeygod.xyz
+PAYMENT_SITE_URL=https://monkeygod.cloud
+PAYMENT_HOST=monkeygod.cloud
+PUBLIC_BASE_URL=https://monkeygod.cloud
 PREVIEW_BASE_URL=https://pub-8565158f23444cbbb9c07a3b1f102e56.r2.dev
 CRYPTO_BTC=...   CRYPTO_ETH=...   CRYPTO_LTC=...   CRYPTO_SOL=...
 TELEGRAM_ADMIN=https://t.me/youradmin
@@ -171,7 +171,7 @@ TELEGRAM_CHATROOM=https://t.me/yourchatroom
 Do **not** put secrets in the repo — set them here. The `.env` file is for local only.
 
 ### 3. Add both custom domains (Railway → service → **Settings → Networking → Custom Domain**)
-Add `monkeygod.fun`, then add `monkeygod.xyz`. For **each** domain Railway shows a
+Add `monkeygod.fun`, then add `monkeygod.cloud`. For **each** domain Railway shows a
 target host that looks like `xxxxxxxx.up.railway.app`. **Copy that exact value** —
 it's unique per domain and you can't know it before adding the domain.
 
@@ -189,8 +189,8 @@ Move each domain's nameservers to Cloudflare, then add (DNS-only, **grey cloud**
 |---|---|---|---|---|
 | monkeygod.fun | CNAME | `@` | `xxxxxxxx.up.railway.app` | DNS only (grey) |
 | monkeygod.fun | CNAME | `www` | `xxxxxxxx.up.railway.app` | DNS only (grey) |
-| monkeygod.xyz | CNAME | `@` | `yyyyyyyy.up.railway.app` | DNS only (grey) |
-| monkeygod.xyz | CNAME | `www` | `yyyyyyyy.up.railway.app` | DNS only (grey) |
+| monkeygod.cloud | CNAME | `@` | `yyyyyyyy.up.railway.app` | DNS only (grey) |
+| monkeygod.cloud | CNAME | `www` | `yyyyyyyy.up.railway.app` | DNS only (grey) |
 
 Cloudflare **flattens** the apex `CNAME` automatically, so a `CNAME` on `@` works.
 Keep the cloud **grey (DNS only)** — orange-proxy can fight Railway's TLS. Each
@@ -203,12 +203,12 @@ domain uses **its own** Railway target (the two are different).
 |---|---|---|---|
 | monkeygod.fun | ALIAS (or ANAME) | `@` | `xxxxxxxx.up.railway.app` |
 | monkeygod.fun | CNAME | `www` | `xxxxxxxx.up.railway.app` |
-| monkeygod.xyz | ALIAS (or ANAME) | `@` | `yyyyyyyy.up.railway.app` |
-| monkeygod.xyz | CNAME | `www` | `yyyyyyyy.up.railway.app` |
+| monkeygod.cloud | ALIAS (or ANAME) | `@` | `yyyyyyyy.up.railway.app` |
+| monkeygod.cloud | CNAME | `www` | `yyyyyyyy.up.railway.app` |
 
 ### Option C — provider with NO apex CNAME/ALIAS support
 Point the apex at `www` instead: set the **www** `CNAME` to the Railway target,
-add `www.monkeygod.fun` / `www.monkeygod.xyz` as the custom domains in Railway,
+add `www.monkeygod.fun` / `www.monkeygod.cloud` as the custom domains in Railway,
 and use the registrar's "domain forwarding" to redirect `@` → `www`.
 
 > Replace `xxxxxxxx.up.railway.app` / `yyyyyyyy.up.railway.app` with the **exact**
@@ -218,7 +218,7 @@ and use the registrar's "domain forwarding" to redirect `@` → `www`.
 ### Verify
 ```bash
 curl -I https://monkeygod.fun     # -> landing
-curl -I https://monkeygod.xyz     # -> embedded card checkout
+curl -I https://monkeygod.cloud     # -> embedded card checkout
 ```
 
 The 1200×630 share image is an SVG at `/assets/og-image.svg`. Some platforms
