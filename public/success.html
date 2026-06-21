@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark only" />
+  <meta name="robots" content="noindex" />
+  <title>Payment Received — MONKEYGOD</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body>
+  <div class="mesh-bg" aria-hidden="true"></div>
+  <main class="content-container">
+    <div class="status-badge"><span class="status-dot"></span> PAYMENT CONFIRMED</div>
+    <div class="crest" aria-hidden="true">
+      <svg viewBox="0 0 240 240" width="120" height="120">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#e9d5ff"/><stop offset="0.45" stop-color="#a855f7"/><stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+          <radialGradient id="d" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="#1c1c1c"/><stop offset="1" stop-color="#090909"/></radialGradient>
+        </defs>
+        <circle cx="120" cy="120" r="104" fill="url(#d)" stroke="url(#g)" stroke-width="3"/>
+        <path d="M78 130 l26 26 l58 -64" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="wordmark" style="font-size:clamp(2rem,9vw,3rem)">Payment Received</h1>
+    <p class="tagline">You're almost in. One quick step unlocks your access.</p>
+
+    <section class="section" style="margin-top:2rem">
+      <div class="addon-note" style="text-align:left">
+        <p style="margin-bottom:.6rem"><strong>Final step:</strong> DM the admin with your <b>payment receipt</b> and the <b>tier</b> you bought. You'll be added within minutes.</p>
+      </div>
+      <a id="dm-admin" class="pay-btn pay-btn-card" href="https://t.me/youradmin" target="_blank" rel="noopener" style="margin-top:1rem">📨 DM Admin To Unlock</a>
+      <a class="pay-btn pay-btn-crypto" href="/">← Back to MONKEYGOD</a>
+    </section>
+
+    <footer class="site-footer">&copy; 2026 MONKEYGOD &bull; SECURE NODES ACTIVE &bull; MONKEYGOD.US</footer>
+  </main>
+  <script>
+    fetch('/api/config').then(r=>r.json()).then(c=>{ if(c.links&&c.links.admin) document.getElementById('dm-admin').href=c.links.admin; }).catch(()=>{});
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.DS_Store
+
+# Real worker secrets (Discord webhook, Square webhook signature key, wallets).
+# Copy worker/r2/config.example.json -> worker/r2/config.json and fill it in.
+worker/r2/config.json

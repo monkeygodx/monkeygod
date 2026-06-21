@@ -1,0 +1,21 @@
+{
+  "square": {
+    "env": "production",
+    "accessToken": "",
+    "locationId": ""
+  },
+  "webhookUrl": "https://YOUR-WORKER.workers.dev/api/square/webhook",
+  "webhookSignatureKeys": [""],
+  "discordWebhook": "",
+  "crypto": [
+    { "coin": "BTC", "label": "Bitcoin", "address": "" },
+    { "coin": "ETH", "label": "Ethereum (ERC-20)", "address": "" },
+    { "coin": "LTC", "label": "Litecoin", "address": "" },
+    { "coin": "SOL", "label": "Solana", "address": "" }
+  ],
+  "links": {
+    "admin": "https://t.me/youradmin",
+    "channel": "https://t.me/yourchannel",
+    "chatroom": "https://t.me/yourchatroom"
+  }
+}

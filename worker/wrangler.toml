@@ -1,0 +1,24 @@
+name = "monkeygod"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+# Static site files (index.html, styles.css, script.js, success.html, assets/)
+# come from the shared public/ folder. previews/ is excluded (served from R2).
+[assets]
+directory = "../public"
+binding = "ASSETS"
+# Run the Worker BEFORE serving assets so the kill-switch override can intercept
+# every page route (otherwise assets are served first and the Worker never runs).
+run_worker_first = true
+
+# R2 bucket holds:
+#   data/config.json   -> Square tokens, Discord webhook, crypto, links (secrets)
+#   data/override.html  -> kill-switch: if non-empty, replaces the whole site
+#   preview*.mp4        -> slider videos (served publicly via r2.dev)
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "monkeygod"
+
+[vars]
+PREVIEW_BASE_URL = "https://pub-8565158f23444cbbb9c07a3b1f102e56.r2.dev"

@@ -1,0 +1,14 @@
+{
+  "name": "monkeygod",
+  "version": "1.0.0",
+  "description": "MONKEYGOD - exclusive access vault (Square + Crypto checkout)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

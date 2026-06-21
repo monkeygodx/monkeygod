@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark only" />
+  <meta name="robots" content="noindex" />
+  <title>Checkout — MONKEYGOD</title>
+  <meta name="description" content="Secure card checkout for MONKEYGOD vault access." />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=7" />
+</head>
+<body>
+  <div class="mesh-bg" aria-hidden="true"></div>
+
+  <main class="content-container pay-page">
+    <a class="pay-back" id="pay-back" href="#">← Back</a>
+
+    <h1 class="wordmark" style="font-size:clamp(2rem,9vw,3rem)">MONKEYGOD</h1>
+    <div class="status-badge"><span class="status-dot"></span> SECURE CHECKOUT</div>
+
+    <div class="pay-card">
+      <h2 class="pay-h">Choose your tier</h2>
+      <div id="tier-pills" class="tier-pills"><!-- injected --></div>
+
+      <div class="order-total">
+        <span>Total</span>
+        <span id="order-amount">—</span>
+      </div>
+
+      <h2 class="pay-h">Card details</h2>
+      <div id="card-status" class="pay-note">Loading secure card field…</div>
+      <div id="card-container" class="card-container"></div>
+
+      <div id="pay-error" class="co-error" hidden></div>
+
+      <button id="pay-btn" class="pay-btn pay-btn-card" disabled>
+        <span id="pay-btn-text">Pay</span>
+      </button>
+      <a id="pay-crypto" class="pay-btn pay-btn-crypto" href="#">₿ Pay with crypto instead</a>
+
+      <p class="co-fineprint">
+        Payments are processed securely by <b>Square</b>. Your card details never touch our servers.
+        After paying, DM the admin your receipt to unlock access.
+      </p>
+    </div>
+
+    <footer class="site-footer">&copy; 2026 MONKEYGOD &bull; SECURE NODES ACTIVE</footer>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/pay.js?v=7"></script>
+</body>
+</html>
