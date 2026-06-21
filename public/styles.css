@@ -239,6 +239,21 @@ body{
 .pay-card .order-total{padding:.4rem 0 1.2rem;margin-bottom:.6rem;border-bottom:1px solid var(--glass-border)}
 .pay-card .pay-btn{margin-top:.4rem}
 
+/* order summary (pre-selected tier, read-only) */
+.order-summary{display:flex;justify-content:space-between;align-items:baseline;padding:.2rem 0 1.1rem;margin-bottom:1.1rem;border-bottom:1px solid var(--glass-border)}
+.order-tier{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2)}
+.order-amount{font-family:'Cinzel',serif;font-weight:700;font-size:1.7rem;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* wallets (Apple Pay / Google Pay) */
+.wallet-container{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.2rem}
+.wallet-container:empty{display:none}
+.wallet-btn{min-height:46px}
+.apple-pay-button{-webkit-appearance:-apple-pay-button;appearance:-apple-pay-button;-apple-pay-button-type:plain;-apple-pay-button-style:white;height:46px;width:100%;border-radius:13px;cursor:pointer;border:none}
+.wallet-sep{display:flex;align-items:center;text-align:center;color:var(--muted);font-size:.72rem;font-weight:600;margin:.9rem 0 .8rem;gap:.7rem}
+.wallet-sep::before,.wallet-sep::after{content:"";flex:1;height:1px;background:var(--glass-border)}
+.wallet-sep[hidden]{display:none}
+#success-card .crest{display:flex;justify-content:center;margin-bottom:.4rem}
+
 /* ---- toast ---- */
 .toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);background:rgba(20,20,20,.97);border:1px solid rgba(168,85,247,.35);color:#fff;padding:.7rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:600;z-index:200;box-shadow:0 12px 30px rgba(0,0,0,.6)}
 .toast[hidden]{display:none}

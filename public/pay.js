@@ -1,8 +1,10 @@
 'use strict';
 
-/* MONKEYGOD — embedded Square card checkout (Web Payments SDK).
-   Flow: load config -> load SDK -> attach card field -> tokenize on Pay ->
-   POST /api/charge -> redirect to /success. The server owns the price. */
+/* MONKEYGOD — embedded checkout (Web Payments SDK).
+   Tier is pre-chosen on the previous page (?tier=). No tier picker here.
+   Flow: load config -> mount Apple Pay / Google Pay + card -> tokenize on pay ->
+   POST /api/charge -> reveal the tier's private link inline (no redirect).
+   The server owns the price. */
 
 const $ = (s) => document.querySelector(s);
 const moneyShort = (cents) => {
@@ -15,6 +17,7 @@ const TIER_LABEL = { basic: 'Basic', premium: 'Premium', exclusive: 'Exclusive' 
 let CONFIG = null;
 let card = null;
 let selectedTier = 'premium';
+let paid = false;
 
 function toast(msg, ms) {
   const t = $('#toast');
@@ -36,29 +39,9 @@ function tierFromUrl() {
   return t && TIER_ORDER.includes(t) ? t : null;
 }
 
-function renderPills() {
-  const wrap = $('#tier-pills');
-  wrap.innerHTML = '';
-  for (const key of TIER_ORDER) {
-    const p = CONFIG.products[key];
-    if (!p) continue;
-    const b = document.createElement('button');
-    b.className = 'tier-pill' + (key === selectedTier ? ' active' : '');
-    b.dataset.tier = key;
-    b.innerHTML = `<span class="tp-name">${TIER_LABEL[key] || key}</span><span class="tp-price">${moneyShort(p.amount)}</span>`;
-    b.addEventListener('click', () => selectTier(key));
-    wrap.appendChild(b);
-  }
-}
-
-function selectTier(key) {
-  if (!CONFIG.products[key]) return;
-  selectedTier = key;
-  document.querySelectorAll('.tier-pill').forEach((b) =>
-    b.classList.toggle('active', b.dataset.tier === key)
-  );
-  $('#order-amount').textContent = moneyShort(CONFIG.products[key].amount);
-  $('#pay-btn-text').textContent = `Pay ${moneyShort(CONFIG.products[key].amount)}`;
+function amountCents() {
+  const p = CONFIG.products[selectedTier];
+  return p ? p.amount : 0;
 }
 
 function loadSquareSdk(env) {
@@ -70,83 +53,162 @@ function loadSquareSdk(env) {
     const s = document.createElement('script');
     s.src = src;
     s.onload = resolve;
-    s.onerror = () => reject(new Error('Could not load the Square payment SDK.'));
+    s.onerror = () => reject(new Error('payment SDK failed to load'));
     document.head.appendChild(s);
   });
 }
 
-async function initCard() {
-  if (!CONFIG.squareEmbedReady || !CONFIG.squareAppId || !CONFIG.squareLocationId) {
-    $('#card-status').textContent =
-      'Card payments aren’t live yet — use crypto below or DM the admin.';
-    $('#pay-btn').disabled = true;
-    return;
+function buildPaymentRequest(payments) {
+  return payments.paymentRequest({
+    countryCode: 'US',
+    currencyCode: 'USD',
+    total: { amount: (amountCents() / 100).toFixed(2), label: 'Total' },
+  });
+}
+
+// Charge a tokenized source (card or wallet) and reveal the success panel.
+async function charge(sourceId, verificationToken) {
+  showError('');
+  const res = await fetch('/api/charge', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tier: selectedTier, sourceId, buyerVerificationToken: verificationToken }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.ok && data.ok) {
+    showSuccess();
+    return true;
   }
+  showError(data.message || 'Payment could not be completed. Try another card.');
+  return false;
+}
 
-  try {
-    await loadSquareSdk(CONFIG.squareEnv);
-    if (!window.Square) throw new Error('Square SDK unavailable.');
+function showSuccess() {
+  paid = true;
+  const link = (CONFIG.tierLinks && CONFIG.tierLinks[selectedTier]) || '';
+  const a = $('#join-link');
+  if (link) {
+    a.href = link;
+  } else {
+    a.textContent = 'Message the admin to get added';
+    a.href = (CONFIG.links && CONFIG.links.admin) || '#';
+  }
+  $('#checkout-card').hidden = true;
+  $('#success-card').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    const payments = window.Square.payments(CONFIG.squareAppId, CONFIG.squareLocationId);
-    card = await payments.card({
-      style: {
-        input: { color: '#ffffff', fontSize: '16px' },
-        '.input-container': { borderColor: 'rgba(255,255,255,0.14)', borderRadius: '12px' },
-        '.input-container.is-focus': { borderColor: '#a855f7' },
-        '.input-container.is-error': { borderColor: '#ef4444' },
-        '.message-text.is-error': { color: '#fca5a5' },
-        '@placeholder': { color: '#6b7280' },
-      },
-    });
-    await card.attach('#card-container');
-
-    $('#card-status').hidden = true;
-    $('#pay-btn').disabled = false;
-  } catch (err) {
-    console.error('[square] init failed', err);
-    $('#card-status').textContent =
-      'Card field failed to load. Refresh the page, or pay with crypto / DM the admin.';
-    $('#pay-btn').disabled = true;
+// ---- Wallets (Apple Pay / Google Pay) ----
+async function tokenizeWallet(method) {
+  const result = await method.tokenize();
+  if (result.status === 'OK') {
+    await charge(result.token, result.details && result.details.verificationToken);
+  } else if (result.errors && result.errors[0]) {
+    showError(result.errors[0].message || 'Payment was not completed.');
   }
 }
 
-async function pay() {
-  if (!card) return;
+async function initWallets(payments) {
+  const container = $('#wallet-container');
+  let any = false;
+
+  // Google Pay
+  try {
+    const pr = buildPaymentRequest(payments);
+    const googlePay = await payments.googlePay(pr);
+    const el = document.createElement('div');
+    el.id = 'gpay-btn';
+    el.className = 'wallet-btn';
+    container.appendChild(el);
+    await googlePay.attach('#gpay-btn', { buttonColor: 'white', buttonType: 'long', buttonSizeMode: 'fill' });
+    el.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await tokenizeWallet(googlePay); } catch (err) { console.error(err); }
+    });
+    any = true;
+  } catch (e) {
+    console.warn('[wallet] google pay unavailable', e && e.message);
+  }
+
+  // Apple Pay (Safari on Apple devices; requires the domain registered in Square)
+  try {
+    const pr = buildPaymentRequest(payments);
+    const applePay = await payments.applePay(pr);
+    const btn = document.createElement('button');
+    btn.id = 'applepay-btn';
+    btn.className = 'apple-pay-button';
+    btn.setAttribute('aria-label', 'Pay with Apple Pay');
+    container.appendChild(btn);
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await tokenizeWallet(applePay); } catch (err) { console.error(err); }
+    });
+    any = true;
+  } catch (e) {
+    console.warn('[wallet] apple pay unavailable', e && e.message);
+  }
+
+  if (any) $('#wallet-sep').hidden = false;
+}
+
+// ---- Card field ----
+async function initCard(payments) {
+  card = await payments.card({
+    style: {
+      input: { color: '#ffffff', fontSize: '16px' },
+      '.input-container': { borderColor: 'rgba(255,255,255,0.14)', borderRadius: '12px' },
+      '.input-container.is-focus': { borderColor: '#a855f7' },
+      '.input-container.is-error': { borderColor: '#ef4444' },
+      '.message-text.is-error': { color: '#fca5a5' },
+      '@placeholder': { color: '#6b7280' },
+    },
+  });
+  await card.attach('#card-container');
+  $('#card-status').hidden = true;
+  $('#pay-btn').disabled = false;
+}
+
+async function payWithCard() {
+  if (!card || paid) return;
   const btn = $('#pay-btn');
   showError('');
   btn.disabled = true;
   const label = $('#pay-btn-text').textContent;
   $('#pay-btn-text').textContent = 'Processing…';
-
   try {
     const result = await card.tokenize();
     if (result.status !== 'OK') {
-      const msg =
-        result.errors && result.errors[0]
-          ? result.errors[0].message
-          : 'Please check your card details.';
-      showError(msg);
+      showError((result.errors && result.errors[0] && result.errors[0].message) || 'Please check your card details.');
       return;
     }
-
-    const res = await fetch('/api/charge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tier: selectedTier, sourceId: result.token }),
-    });
-    const data = await res.json().catch(() => ({}));
-
-    if (res.ok && data.ok) {
-      window.location.href = data.redirect || '/success?tier=' + encodeURIComponent(selectedTier);
-      return;
-    }
-    showError(data.message || 'Payment could not be completed. Try another card or pay with crypto.');
+    await charge(result.token);
   } catch (e) {
     console.error('[pay] error', e);
     showError('Network error — please try again.');
   } finally {
-    btn.disabled = false;
-    $('#pay-btn-text').textContent = label;
+    if (!paid) {
+      btn.disabled = false;
+      $('#pay-btn-text').textContent = label;
+    }
+  }
+}
+
+async function initPayments() {
+  if (!CONFIG.squareEmbedReady || !CONFIG.squareAppId || !CONFIG.squareLocationId) {
+    $('#card-status').textContent = 'Checkout is being set up — please try again shortly.';
+    $('#pay-btn').disabled = true;
+    return;
+  }
+  try {
+    await loadSquareSdk(CONFIG.squareEnv);
+    if (!window.Square) throw new Error('SDK unavailable');
+    const payments = window.Square.payments(CONFIG.squareAppId, CONFIG.squareLocationId);
+    await initWallets(payments);
+    await initCard(payments);
+  } catch (err) {
+    console.error('[checkout] init failed', err);
+    $('#card-status').textContent = 'Checkout failed to load. Refresh the page or message the admin.';
+    $('#pay-btn').disabled = true;
   }
 }
 
@@ -158,17 +220,19 @@ async function boot() {
     return;
   }
 
-  selectedTier = tierFromUrl() || (CONFIG.products.premium ? 'premium' : TIER_ORDER.find((k) => CONFIG.products[k])) || 'basic';
+  selectedTier =
+    tierFromUrl() ||
+    (CONFIG.products.premium ? 'premium' : TIER_ORDER.find((k) => CONFIG.products[k])) ||
+    'basic';
 
-  // Back -> main site; crypto -> main site (where the crypto options live).
-  $('#pay-back').href = CONFIG.mainSiteUrl || '/';
-  $('#pay-crypto').href = CONFIG.mainSiteUrl || '/';
+  const p = CONFIG.products[selectedTier];
+  $('#order-tier').textContent = TIER_LABEL[selectedTier] || selectedTier;
+  $('#order-amount').textContent = p ? moneyShort(p.amount) : '—';
+  $('#pay-btn-text').textContent = p ? `Pay ${moneyShort(p.amount)}` : 'Pay';
 
-  renderPills();
-  selectTier(selectedTier);
-  $('#pay-btn').addEventListener('click', pay);
+  $('#pay-btn').addEventListener('click', payWithCard);
 
-  await initCard();
+  await initPayments();
 }
 
 boot();

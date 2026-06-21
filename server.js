@@ -137,6 +137,12 @@ function envDefaults() {
       channel: process.env.TELEGRAM_CHANNEL || 'https://t.me/yourchannel',
       chatroom: process.env.TELEGRAM_CHATROOM || 'https://t.me/yourchatroom',
     },
+    // Per-tier private invite links shown after a successful payment.
+    tierLinks: {
+      basic: process.env.TIER_LINK_BASIC || '',
+      premium: process.env.TIER_LINK_PREMIUM || '',
+      exclusive: process.env.TIER_LINK_EXCLUSIVE || '',
+    },
   };
 }
 
@@ -164,6 +170,9 @@ async function loadConfig() {
       }
       if (remote.links && typeof remote.links === 'object') {
         base.links = { ...base.links, ...remote.links };
+      }
+      if (remote.tierLinks && typeof remote.tierLinks === 'object') {
+        base.tierLinks = { ...base.tierLinks, ...remote.tierLinks };
       }
     }
   } catch (e) {
@@ -208,6 +217,7 @@ app.get('/api/config', async (req, res) => {
     previews: listPreviews(),
     crypto: cfg.crypto,
     links: cfg.links,
+    tierLinks: cfg.tierLinks,
     squareReady: ready,
     squareEmbedReady: embedReady,
     squareEnv: sq.env,

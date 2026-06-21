@@ -29,20 +29,25 @@
       </svg>
     </div>
     <h1 class="wordmark" style="font-size:clamp(2rem,9vw,3rem)">Payment Received</h1>
-    <p class="tagline">You're almost in. One quick step unlocks your access.</p>
+    <p class="tagline">You're in. Tap below to open your private channel.</p>
 
     <section class="section" style="margin-top:2rem">
-      <div class="addon-note" style="text-align:left">
-        <p style="margin-bottom:.6rem"><strong>Final step:</strong> DM the admin with your <b>payment receipt</b> and the <b>tier</b> you bought. You'll be added within minutes.</p>
-      </div>
-      <a id="dm-admin" class="pay-btn pay-btn-card" href="https://t.me/youradmin" target="_blank" rel="noopener" style="margin-top:1rem">📨 DM Admin To Unlock</a>
-      <a class="pay-btn pay-btn-crypto" href="/">← Back to MONKEYGOD</a>
+      <a id="join-link" class="pay-btn pay-btn-card" href="#" target="_blank" rel="noopener" style="margin-top:1rem">Join your channel →</a>
+      <p class="co-fineprint">Save this link — it's your access. Having trouble? Message the admin.</p>
     </section>
 
-    <footer class="site-footer">&copy; 2026 MONKEYGOD &bull; SECURE NODES ACTIVE &bull; MONKEYGOD.US</footer>
+    <footer class="site-footer">&copy; 2026 MONKEYGOD &bull; SECURE NODES ACTIVE</footer>
   </main>
   <script>
-    fetch('/api/config').then(r=>r.json()).then(c=>{ if(c.links&&c.links.admin) document.getElementById('dm-admin').href=c.links.admin; }).catch(()=>{});
+    (function(){
+      var tier = new URLSearchParams(location.search).get('tier');
+      fetch('/api/config').then(function(r){return r.json();}).then(function(c){
+        var a = document.getElementById('join-link');
+        var link = c.tierLinks && tier && c.tierLinks[tier];
+        if (link) { a.href = link; }
+        else { a.textContent = 'Message the admin to get added'; a.href = (c.links && c.links.admin) || '#'; }
+      }).catch(function(){});
+    })();
   </script>
 </body>
 </html>
