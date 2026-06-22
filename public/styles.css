@@ -41,28 +41,24 @@ body{
     200px 200px,
     200px 200px,
     auto;
-animation: bgMove 4s linear infinite;
-  @keyframes bgMove {
-  from {
-    background-position: 0 0, 0 0, 0 0;
-  }
-  to {
-    background-position: 200px 200px, -200px -200px, 0 0;
-  }
-}
+background-size:
+  200px 200px,
+  200px 200px,
+  auto;
+
 .mesh-bg{
-  animation: bgDrift 20s ease-in-out infinite alternate;
+  animation: bgDrift 4s ease-in-out infinite alternate;
 }
 
 @keyframes bgDrift{
   0%{
-    transform: translate(0,0) scale(1);
+    transform: translate(0px,0px);
   }
+
   100%{
-    transform: translate(-20px,-10px) scale(1.03);
+    transform: translate(100px,50px);
   }
-}}
-  background-image:
+}
     linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
     radial-gradient(circle at 50% -10%, rgba(168,85,247,.08) 0%, transparent 50%);
