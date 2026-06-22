@@ -6,10 +6,10 @@ const TIER_DATA = {
     name: 'Basic',
     tag: '',
     features: [
-      { t: 'Access 300+ Videos', in: true },
-      { t: 'Teen Content', in: false },
-      { t: 'Only Quality Content', in: true },
-      { t: 'HD Audio Content', in: false },
+      { t: 'Access 1000+ Videos', in: true },
+      { t: 'Fresh Content', in: true },
+      { t: 'High Quality Videos', in: true },
+      { t: 'HD Audio (With Sound)', in: fals },
     ],
   },
   premium: {
@@ -18,6 +18,8 @@ const TIER_DATA = {
     features: [
       { t: 'Access 5,000+ Videos', in: true },
       { t: 'Exclusive Content & Early Access', in: true },
+      { t: 'Fresh Content & Updates', in: true },
+      { t: 'High Quality Videos', in: true },
     ],
   },
   exclusive: {
@@ -25,8 +27,10 @@ const TIER_DATA = {
     tag: '★ HIGHEST TIER',
     featured: true,
     features: [
-      { t: 'ALL Omegle Wins on Internet (Sorted by Quality + Audio)', in: true },
-      { t: 'Teen Videos With Friends', in: true },
+      { t: 'ALL Monkey/Omegle Wins On The Internet', in: true },
+      { t: 'Extra Omegle Channel', in: true },
+      { t: 'High Quality Videos', in: true },
+      { t: 'Lifetime Access & High Priority Support ', in: true },
     ],
   },
 };
