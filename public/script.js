@@ -28,7 +28,7 @@ const TIER_DATA = {
     featured: true,
     features: [
       { t: 'ALL Monkey/Omegle Wins On The Internet', in: true },
-      { t: 'Extra Omegle Channel', in: true },
+      { t: 'Extra Omegle Wins Channel', in: true },
       { t: 'High Quality Videos', in: true },
       { t: 'Lifetime Access & High Priority Support ', in: true },
     ],
