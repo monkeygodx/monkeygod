@@ -160,7 +160,7 @@ async function initCard(payments) {
   // build, fall back to an unstyled (but fully working) field so checkout
   // can't be blocked by a styling issue.
   const style = {
-    input: { color: '#ffffff', fontSize: '16px' },
+    input: { color: '#000000', fontSize: '16px' },
     'input::placeholder': { color: '#6b7280' },
     '.input-container': { borderColor: 'rgba(255,255,255,0.14)', borderRadius: '12px' },
     '.input-container.is-focus': { borderColor: '#a855f7' },
