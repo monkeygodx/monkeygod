@@ -73,6 +73,7 @@ const PRODUCTS = {
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || '';
 const R2_BUCKET = process.env.R2_BUCKET || 'monkeygod';
 const R2_CONFIG_KEY = process.env.R2_CONFIG_KEY || 'data/config.json';
+const R2_OVERRIDE_KEY = process.env.R2_OVERRIDE_KEY || 'data/override.html';
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
 const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
 const R2_READY = Boolean(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY);
@@ -81,11 +82,12 @@ const CONFIG_TTL_MS = parseInt(process.env.CONFIG_TTL_MS || '30000', 10);
 const sha256hex = (s) => crypto.createHash('sha256').update(s).digest('hex');
 const hmac = (key, s) => crypto.createHmac('sha256', key).update(s).digest();
 
-// Minimal AWS SigV4 GET against the R2 S3 endpoint (region "auto", service "s3").
-async function r2GetConfig() {
+// Minimal AWS SigV4 GET of one object from the R2 S3 endpoint (region "auto").
+// Returns the body text, or null if missing / not configured / on error.
+async function r2GetObject(key) {
   if (!R2_READY) return null;
   const host = `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-  const canonicalUri = '/' + R2_BUCKET + '/' + R2_CONFIG_KEY.split('/').map(encodeURIComponent).join('/');
+  const canonicalUri = '/' + R2_BUCKET + '/' + key.split('/').map(encodeURIComponent).join('/');
   const region = 'auto';
   const service = 's3';
   const amzdate = new Date().toISOString().replace(/[:-]|\.\d{3}/g, ''); // YYYYMMDDTHHMMSSZ
@@ -108,11 +110,33 @@ async function r2GetConfig() {
   const res = await fetch(`https://${host}${canonicalUri}`, {
     headers: { Authorization: authorization, 'x-amz-content-sha256': payloadHash, 'x-amz-date': amzdate, host },
   });
+  if (res.status === 404) return null;
   if (!res.ok) {
-    console.warn('[r2] config fetch failed', res.status);
+    console.warn('[r2] get failed', key, res.status);
     return null;
   }
-  return JSON.parse(await res.text());
+  return res.text();
+}
+
+async function r2GetConfig() {
+  const txt = await r2GetObject(R2_CONFIG_KEY);
+  if (!txt) return null;
+  try { return JSON.parse(txt); } catch (e) { console.warn('[r2] config.json is not valid JSON'); return null; }
+}
+
+// Emergency kill-switch: if data/override.html in the bucket is non-empty, that
+// HTML replaces every page on the live site. Empty/missing = normal site.
+let _ovHtml = null;
+let _ovAt = 0;
+async function loadOverride() {
+  if (!R2_READY) return null;
+  if (Date.now() - _ovAt < CONFIG_TTL_MS) return _ovHtml;
+  try {
+    const t = await r2GetObject(R2_OVERRIDE_KEY);
+    _ovHtml = t && t.trim() ? t : null;
+  } catch (e) { /* keep last known value */ }
+  _ovAt = Date.now();
+  return _ovHtml;
 }
 
 // Defaults pulled from env vars (used locally / as fallback when R2 isn't set).
@@ -143,6 +167,7 @@ function envDefaults() {
       premium: process.env.TIER_LINK_PREMIUM || '',
       exclusive: process.env.TIER_LINK_EXCLUSIVE || '',
     },
+    discordWebhook: process.env.DISCORD_WEBHOOK || '',
   };
 }
 
@@ -168,12 +193,15 @@ async function loadConfig() {
         const c = remote.crypto.filter((x) => x && x.address);
         if (c.length) base.crypto = c;
       }
+      // For links/tierLinks, only NON-EMPTY bucket values override (so a blank
+      // emergency-backup field never wipes out the live value).
       if (remote.links && typeof remote.links === 'object') {
-        base.links = { ...base.links, ...remote.links };
+        for (const kk of Object.keys(remote.links)) if (remote.links[kk]) base.links[kk] = remote.links[kk];
       }
       if (remote.tierLinks && typeof remote.tierLinks === 'object') {
-        base.tierLinks = { ...base.tierLinks, ...remote.tierLinks };
+        for (const kk of Object.keys(remote.tierLinks)) if (remote.tierLinks[kk]) base.tierLinks[kk] = remote.tierLinks[kk];
       }
+      if (remote.discordWebhook) base.discordWebhook = remote.discordWebhook;
     }
   } catch (e) {
     console.warn('[config] using env fallback:', e.message);
@@ -207,6 +235,19 @@ function listPreviews() {
 const app = express();
 app.use(express.json());
 app.disable('x-powered-by');
+
+// Emergency override: when data/override.html in the bucket is non-empty, serve
+// it for every page route (APIs, assets and the Apple Pay file still work).
+const isPageRoute = (p) => p === '/' || !/\.[a-z0-9]+$/i.test(p);
+app.use(async (req, res, next) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api/') || req.path.startsWith('/.well-known/')) return next();
+  if (!isPageRoute(req.path)) return next();
+  try {
+    const ov = await loadOverride();
+    if (ov) return res.set('cache-control', 'no-store').type('html').send(ov);
+  } catch (e) { /* fall through to normal site */ }
+  next();
+});
 
 // Public config the frontend needs to render (no secrets).
 app.get('/api/config', async (req, res) => {
@@ -347,8 +388,9 @@ app.get('/', (req, res, next) => {
   next(); // fall through to express.static -> index.html
 });
 
-// The embedded card checkout is always reachable at /pay (any domain).
-app.get('/pay', (req, res) => {
+// The embedded card checkout is always reachable at /pay (any domain), and at a
+// clean per-tier URL: /basic, /premium, /exclusive (tier read from the path).
+app.get(['/pay', '/basic', '/premium', '/exclusive'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'pay.html'));
 });
 

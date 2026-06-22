@@ -2,7 +2,7 @@
 :root{
   --gold:#b96bf3;
   --gold-grad:linear-gradient(135deg,#e9d5ff 0%,#a855f7 45%,#7c3aed 100%);
-  --obsidian:#080808;
+  --obsidian:#000000;
   --glass-bg:rgba(255,255,255,0.03);
   --glass-border:rgba(255,255,255,0.10);
   --shine:rgba(255,255,255,0.20);
@@ -28,10 +28,9 @@ body{
 .mesh-bg{
   position:fixed;inset:0;z-index:-1;background-color:var(--obsidian);
   background-image:
-    radial-gradient(circle at 50% -10%, rgba(168,85,247,0.10) 0%, transparent 55%),
-    radial-gradient(circle at 18% 28%, rgba(50,50,50,0.45) 0%, transparent 65%),
-    radial-gradient(circle at 85% 72%, rgba(20,20,20,1) 0%, transparent 70%),
-    linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+    radial-gradient(circle at 50% -10%, rgba(168,85,247,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 18% 28%, rgba(30,30,34,0.22) 0%, transparent 60%),
+    radial-gradient(circle at 85% 78%, rgba(10,10,12,1) 0%, transparent 70%);
 }
 .mesh-bg::after{
   content:'';position:absolute;inset:0;opacity:.035;pointer-events:none;

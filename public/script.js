@@ -194,15 +194,16 @@ function renderTiers() {
   grid.querySelectorAll('.tier-crypto').forEach((b) => b.addEventListener('click', () => openCrypto(b.dataset.crypto)));
 }
 
-/* Get -> hand off to the payment site (.xyz) where the embedded card form lives.
-   We pass the chosen tier in the query string. If for some reason the payment
-   site URL isn't configured, fall back to the local /pay page. */
+/* Get -> hand off to the payment site (monkeygod.cloud) at the clean per-tier
+   URL (/basic, /premium, /exclusive) where the embedded checkout lives. Falls
+   back to the local /pay?tier= page if the payment site URL isn't configured. */
 function buy(tier, btn) {
   if (!CONFIG.products[tier]) return;
   if (btn) { btn.disabled = true; btn.innerHTML = 'Loading…'; }
-  const base = CONFIG.paymentSiteUrl || '/pay';
-  const sep = base.includes('?') ? '&' : (base.endsWith('/pay') ? '?' : '/?');
-  window.location.href = `${base}${sep}tier=${encodeURIComponent(tier)}`;
+  const base = CONFIG.paymentSiteUrl;
+  window.location.href = base
+    ? `${base.replace(/\/$/, '')}/${encodeURIComponent(tier)}`
+    : `/pay?tier=${encodeURIComponent(tier)}`;
 }
 
 /* ---------------- crypto modal ---------------- */

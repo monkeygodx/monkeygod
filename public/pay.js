@@ -35,6 +35,9 @@ function showError(msg) {
 }
 
 function tierFromUrl() {
+  // Path form first: /basic, /premium, /exclusive. Then ?tier= fallback.
+  const seg = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  if (TIER_ORDER.includes(seg)) return seg;
   const t = new URLSearchParams(location.search).get('tier');
   return t && TIER_ORDER.includes(t) ? t : null;
 }
