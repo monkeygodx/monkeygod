@@ -102,12 +102,21 @@ function showSuccess() {
 }
 
 // ---- Wallets (Apple Pay / Google Pay) ----
-async function tokenizeWallet(method) {
-  const result = await method.tokenize();
+async function tokenizeWallet(method, label) {
+  let result;
+  try {
+    result = await method.tokenize();
+  } catch (err) {
+    console.error('[wallet] tokenize threw', err);
+    showError(`${label} couldn't start${err && err.message ? ' — ' + err.message : '. Make sure a card is set up and pop-ups are allowed.'}`);
+    return;
+  }
   if (result.status === 'OK') {
     await charge(result.token, result.details && result.details.verificationToken);
-  } else if (result.errors && result.errors[0]) {
-    showError(result.errors[0].message || 'Payment was not completed.');
+  } else if (result.status === 'Cancel') {
+    /* buyer closed the wallet sheet — not an error */
+  } else {
+    showError((result.errors && result.errors[0] && result.errors[0].message) || `${label} was not completed.`);
   }
 }
 
@@ -126,7 +135,7 @@ async function initWallets(payments) {
     await googlePay.attach('#gpay-btn', { buttonColor: 'white', buttonType: 'long', buttonSizeMode: 'fill' });
     el.addEventListener('click', async (e) => {
       e.preventDefault();
-      try { await tokenizeWallet(googlePay); } catch (err) { console.error(err); }
+      await tokenizeWallet(googlePay, 'Google Pay');
     });
     any = true;
   } catch (e) {
@@ -144,7 +153,7 @@ async function initWallets(payments) {
     container.appendChild(btn);
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      try { await tokenizeWallet(applePay); } catch (err) { console.error(err); }
+      await tokenizeWallet(applePay, 'Apple Pay');
     });
     any = true;
   } catch (e) {
