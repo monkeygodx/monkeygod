@@ -59,14 +59,7 @@ background-size:
     transform: translate(100px,50px);
   }
 }
-    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
-    radial-gradient(circle at 50% -10%, rgba(168,85,247,.08) 0%, transparent 50%);
-
-  background-size:
-    200px 200px,
-    200px 200px,
-    auto;
+ 
 }
 .mesh-bg::after{
   content:'';position:absolute;inset:0;opacity:.035;pointer-events:none;
