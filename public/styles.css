@@ -41,6 +41,15 @@ body{
     200px 200px,
     200px 200px,
     auto;
+animation: bgMove 4s linear infinite;
+  @keyframes bgMove {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 200px 200px, -200px -200px, 0 0;
+  }
+}
 .mesh-bg{
   animation: bgDrift 20s ease-in-out infinite alternate;
 }
