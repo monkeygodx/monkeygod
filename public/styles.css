@@ -41,7 +41,18 @@ body{
     200px 200px,
     200px 200px,
     auto;
+.mesh-bg{
+  animation: bgDrift 20s ease-in-out infinite alternate;
 }
+
+@keyframes bgDrift{
+  0%{
+    transform: translate(0,0) scale(1);
+  }
+  100%{
+    transform: translate(-20px,-10px) scale(1.03);
+  }
+}}
   background-image:
     linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
