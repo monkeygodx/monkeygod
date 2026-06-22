@@ -9,7 +9,7 @@ const TIER_DATA = {
       { t: 'Access 1000+ Videos', in: true },
       { t: 'Fresh Content', in: true },
       { t: 'High Quality Videos', in: true },
-      { t: 'HD Audio (With Sound)', in: fals },
+      { t: 'HD Audio (With Sound)', in: false },
     ],
   },
   premium: {
