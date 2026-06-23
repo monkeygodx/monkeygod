@@ -220,6 +220,36 @@ function squareCtx(cfg) {
   return { sq, apiBase, ready, embedReady };
 }
 
+// Fire-and-forget Discord notification on a successful payment. The webhook URL
+// comes from config (DISCORD_WEBHOOK env var or the bucket's discordWebhook).
+async function notifyDiscord(webhook, { product, amountCents, paymentId, status }) {
+  if (!webhook) return;
+  try {
+    await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: 'MONKEYGOD',
+        embeds: [
+          {
+            title: '💸 Payment received',
+            color: 0xa855f7,
+            fields: [
+              { name: 'Product', value: String(product || '—'), inline: true },
+              { name: 'Amount', value: `$${(amountCents / 100).toFixed(2)}`, inline: true },
+              { name: 'Status', value: String(status || 'COMPLETED'), inline: true },
+              ...(paymentId ? [{ name: 'Payment ID', value: '`' + paymentId + '`', inline: false }] : []),
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      }),
+    });
+  } catch (e) {
+    console.warn('[discord] notify failed', e.message);
+  }
+}
+
 function listPreviews() {
   try {
     return fs
@@ -312,6 +342,13 @@ app.post('/api/charge', async (req, res) => {
     }
 
     const payment = data && data.payment;
+    // Ping Discord (don't block the buyer's response on it).
+    notifyDiscord(cfg.discordWebhook, {
+      product: product.name,
+      amountCents: product.amount,
+      paymentId: payment && payment.id,
+      status: payment && payment.status,
+    });
     return res.json({
       ok: true,
       paymentId: payment && payment.id,
