@@ -85,7 +85,7 @@ background-size:
 
 /* ---- hero ---- */
 .wordmark{
-  font-family: 'Playfair Display', Georgia, serif;;font-weight:900;font-size:clamp(2.6rem,11vw,4rem);
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;;font-weight:900;font-size:clamp(2.6rem,11vw,4rem);
   letter-spacing:.06em;margin:.6rem 0 .4rem;line-height:1;
   background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   text-shadow:0 0 30px rgba(168,85,247,.25);
@@ -135,7 +135,8 @@ background-size:
 .tier-tag{align-self:flex-start;margin-bottom:.7rem;font-size:.6rem;font-weight:900;letter-spacing:.08em;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--glass-border);color:#fff;white-space:nowrap}
 .tier-tag.gold{background:var(--gold-grad);color:#0a0a0a;border:none;box-shadow:0 4px 14px rgba(168,85,247,.5)}
 .tier-name{font-size:1.45rem;font-weight:900;color:#fff;letter-spacing:-.01em;line-height:1.1;text-transform:uppercase}
-.tier-price{font-family:'Cinzel',serif;font-size:2.7rem;font-weight:700;line-height:1;margin:.45rem 0 0;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tier-price{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:2.7rem;font-weight:700;line-height:1;margin:.45rem 0 0;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .tier-price small{font-family:'Plus Jakarta Sans',sans-serif;font-size:.7rem;font-weight:600;color:var(--muted);-webkit-text-fill-color:var(--muted);margin-left:.45rem}
 .tier-features{list-style:none;margin:1.2rem 0 1.5rem;display:flex;flex-direction:column;gap:.65rem;flex:1}
 .tier-features li{display:flex;align-items:flex-start;gap:.6rem;font-size:.88rem;color:var(--muted2);line-height:1.4}
@@ -219,7 +220,8 @@ background-size:
 @keyframes pop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .modal-close{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.06);border:1px solid var(--glass-border);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.8rem}
 .modal-close:hover{background:rgba(255,255,255,.14)}
-.modal-title{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;margin-bottom:1.1rem;color:#fff}
+.modal-title{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:1.1rem;color:#fff}
 .modal-sub{color:var(--muted);font-size:.85rem;line-height:1.5;margin-bottom:1.1rem}
 .modal-sub b{color:var(--gold)}
 .order-line{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--glass-border);font-weight:700;font-size:.9rem}
@@ -261,7 +263,8 @@ background-size:
 .tier-pill:hover{border-color:rgba(168,85,247,.45)}
 .tier-pill.active{background:rgba(168,85,247,.14);border-color:rgba(168,85,247,.7);box-shadow:0 0 0 1px rgba(168,85,247,.25)}
 .tp-name{font-size:.74rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.04em}
-.tp-price{font-family:'Cinzel',serif;font-size:1.25rem;font-weight:700;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tp-price{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:1.25rem;font-weight:700;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .tier-pill.active .tp-name{color:#fff}
 .card-container{min-height:48px;margin-bottom:1rem}
 .pay-card .order-total{padding:.4rem 0 1.2rem;margin-bottom:.6rem;border-bottom:1px solid var(--glass-border)}
@@ -270,7 +273,8 @@ background-size:
 /* order summary (pre-selected tier, read-only) */
 .order-summary{display:flex;justify-content:space-between;align-items:baseline;padding:.2rem 0 1.1rem;margin-bottom:1.1rem;border-bottom:1px solid var(--glass-border)}
 .order-tier{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2)}
-.order-amount{font-family:'Cinzel',serif;font-weight:700;font-size:1.7rem;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.order-amount{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:700;font-size:1.7rem;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
 /* wallets (Apple Pay / Google Pay) */
 .wallet-container{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.2rem}
