@@ -27,10 +27,10 @@ const TIER_DATA = {
     tag: '★ HIGHEST TIER',
     featured: true,
     features: [
-      { t: 'ALL Monkey/Omegle Wins On The Internet', in: true },
+      { t: 'Access 10,000+ Videos', in: true },
       { t: 'Extra Omegle Wins Channel', in: true },
       { t: 'High Quality Videos', in: true },
-      { t: 'Lifetime Access & High Priority Support ', in: true },
+      { t: 'Lifetime Access', in: true },
     ],
   },
 };
