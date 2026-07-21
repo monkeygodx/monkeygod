@@ -290,6 +290,24 @@ background-size:
 .toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);background:rgba(20,20,20,.97);border:1px solid rgba(168,85,247,.35);color:#fff;padding:.7rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:600;z-index:200;box-shadow:0 12px 30px rgba(0,0,0,.6)}
 .toast[hidden]{display:none}
 
+/* ---- resource card (post-purchase resource funnel) ---- */
+.resource-card{
+  max-width:480px;margin:2.2rem auto 0;text-align:center;
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  border-radius:18px;padding:1.7rem 1.5rem;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+.resource-card.visible{opacity:1;transform:translateY(0)}
+.resource-card h3{
+  font-size:1.05rem;font-weight:800;letter-spacing:-.01em;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.5rem;
+}
+.resource-card p{color:var(--muted2);font-size:.85rem;line-height:1.55;margin-bottom:1.1rem}
+.resource-card p a{color:var(--gold);text-decoration:none;font-weight:700}
+.resource-card p a:hover{text-decoration:underline}
+
 /* ---- responsive ---- */
 @media (max-width:430px){
   .tier-grid{grid-template-columns:1fr}
