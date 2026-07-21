@@ -11,6 +11,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css?v=10" />
+  <style>
+    .resource-card {
+      max-width: 480px;
+      margin: 2.5rem auto 0;
+      padding: 1.75rem 1.5rem;
+      border-radius: 16px;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      background: linear-gradient(180deg, rgba(168,85,247,0.06), rgba(0,0,0,0.2));
+      text-align: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .resource-card.visible { opacity: 1; transform: translateY(0); }
+    .resource-card h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #f3e8ff;
+      margin: 0 0 0.5rem;
+    }
+    .resource-card p {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+      margin: 0 0 1.1rem;
+    }
+    .resource-card p a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
+    .resource-card p a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
   <div class="mesh-bg" aria-hidden="true"></div>
@@ -30,10 +61,18 @@
     </div>
     <h1 class="wordmark" style="font-size:clamp(2rem,9vw,3rem)">Payment Received</h1>
     <p class="tagline">You're in. Tap below to open your private channel.</p>
-
     <section class="section" style="margin-top:2rem">
       <a id="join-link" class="pay-btn pay-btn-card" href="#" target="_blank" rel="noopener" style="margin-top:1rem">Join your channel →</a>
       <p class="co-fineprint">Save this link — it's your access. Having trouble? Message the admin.</p>
+    </section>
+
+    <section class="resource-card" id="resourceCard">
+      <h3>Want Your Own Wins?</h3>
+      <p>
+        If you'd like to learn how to get your own wins, or learn more about the MONKEYGOD system,
+        <a href="https://monkeygod.us" target="_blank" rel="noopener">see here</a>.
+      </p>
+      <a class="pay-btn" href="https://monkeygod.us" target="_blank" rel="noopener">Visit MonkeyGod.us</a>
     </section>
 
     <footer class="site-footer">&copy; 2026 MONKEYGOD &bull; SECURE NODES ACTIVE</footer>
@@ -47,6 +86,13 @@
         if (link) { a.href = link; }
         else { a.textContent = 'Message the admin to get added'; a.href = (c.links && c.links.admin) || '#'; }
       }).catch(function(){});
+    })();
+    (function(){
+      var card = document.getElementById('resourceCard');
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if (e.isIntersecting) { card.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.15 });
+      obs.observe(card);
     })();
   </script>
 </body>
